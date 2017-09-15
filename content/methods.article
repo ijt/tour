@@ -302,39 +302,56 @@ The `error` type is a built-in interface similar to `fmt.Stringer`:
 (As with `fmt.Stringer`, the `fmt` package looks for the `error` interface when
 printing values.)
 
+.play methods/errors.go
+
+* Returning errors
+
 Functions often return an `error` value, and calling code should handle errors
 by testing whether the error equals `nil`.
 
-	i, err := strconv.Atoi("42")
-	if err != nil {
-		fmt.Printf("couldn't convert number: %v\n", err)
-		return
-	}
-	fmt.Println("Converted integer:", i)
-
 A nil `error` denotes success; a non-nil `error` denotes failure.
 
-.play methods/errors.go
+.play methods/errors-function.go
+
+* Distinguishing errors with sentinels
+
+Most of the time, the caller of a function that returns an `error` will only
+need to check whether the function failed or succeeded.  However, some functions
+may want to indicate different types of failures to the caller, while still
+allowing a caller that only cares about success to see a non-nil `error`.
+The caller of the function may then change control flow based on the type of error.
+
+For simple errors, you can create a unique `error` value that can be tested for
+equality.  This is called a sentinel error value.
+
+.play methods/errors-sentinel.go
+
+* Distinguishing errors with predicate functions
+
+While simple, sentinel error values make for brittle APIs.  For instance, you
+cannot alter the message returned by the `Error()` method depending on context.
+
+A more flexible way is to keep the custom error unexported and then export a
+function that tests errors for particular categories.  This may start as a
+sentinel error, and then later evolve into a custom type that can be asserted
+on to provide more error information.
+
+.play methods/errors-predicates.go
 
 * Exercise: Errors
 
 Copy your `Sqrt` function from the [[/flowcontrol/8][earlier exercise]] and modify it to return an `error` value.
 
-`Sqrt` should return a non-nil error value when given a negative number, as it doesn't support complex numbers.
+`Sqrt` should return a non-nil error value when given a negative number, as it doesn't support complex numbers,
+such that `Sqrt(-2)` returns an error message `"cannot`Sqrt`negative`number:`-2"`.
 
-Create a new type
+Create a new function
 
-	type ErrNegativeSqrt float64
+	func IsNegativeSqrt(e error) bool
 
-and make it an `error` by giving it a
-
-	func (e ErrNegativeSqrt) Error() string
-
-method such that `ErrNegativeSqrt(-2).Error()` returns `"cannot`Sqrt`negative`number:`-2"`.
+that returns true only when given an `error` from the Sqrt function.
 
 *Note:* a call to `fmt.Sprint(e)` inside the `Error` method will send the program into an infinite loop. You can avoid this by converting `e` first: `fmt.Sprint(float64(e))`. Why?
-
-Change your `Sqrt` function to return an `ErrNegativeSqrt` value when given a negative number.
 
 .play methods/exercise-errors.go
 

@@ -3,29 +3,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"time"
 )
 
-type MyError struct {
-	When time.Time
-	What string
-}
-
-func (e *MyError) Error() string {
-	return fmt.Sprintf("at %v, %s",
-		e.When, e.What)
-}
-
-func run() error {
-	return &MyError{
-		time.Now(),
-		"it didn't work",
-	}
-}
-
 func main() {
-	if err := run(); err != nil {
-		fmt.Println(err)
-	}
+	var err error
+	fmt.Printf("err = %v\n", err)
+	err = errors.New("failed to launch")
+	fmt.Printf("err.Error() = %q\n", err.Error())
+	fmt.Printf("err = %v\n", err)
 }

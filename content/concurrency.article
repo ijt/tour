@@ -57,7 +57,7 @@ Receivers can test whether a channel has been closed by assigning a second param
 
 .play concurrency/close.go
 
-* Producer/consumer
+* Map/reduce
 
 A common pattern is to start up a number of worker goroutines to process a subset of a larger pile of work.  We can use a channel to communicate back the result from each goroutine.
 
@@ -67,9 +67,12 @@ A common pattern is to start up a number of worker goroutines to process a subse
 
 Goroutine functions are typically closures.  A common pitfall is to write the first loop as:
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < numWorkers; i++ {
 		go func() {
-			errc <- run(time.Duration(i) * time.Second)  // Data race!
+                        // Data race!
+                        start, end := workerRange(i)
+			n, err := countTrue(bigData[start:end])
+			ch <- result{id: i+1, n: n, err: err}
 		}()
 	}
 
@@ -83,7 +86,7 @@ A common solution is to create a new variable for each iteration of the loop.
 
 * Select
 
-Let's examine another common scenario: instead of needing the result of all of the workers, we just need the first result.  Once the first worker completes, we want to stop the other workers (why wait for what we don't need?).  To help us, we use the `select` statement.
+Let's examine another common scenario: if one of the computations fails, we want to stop the other long-running computations. We need to wait on two channels: the operation and the cancelation signal. To help us, we use the `select` statement.
 
 The `select` statement lets a goroutine wait on multiple communication operations.
 

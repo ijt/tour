@@ -69,8 +69,8 @@ Goroutine functions are typically closures.  A common pitfall is to write the fi
 
 	for i := 0; i < numWorkers; i++ {
 		go func() {
-                        // Data race!
-                        start, end := workerRange(i)
+			// Data race!
+			start, end := workerRange(i)
 			n, err := countTrue(bigData[start:end])
 			ch <- result{id: i+1, n: n, err: err}
 		}()

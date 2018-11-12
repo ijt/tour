@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/tools/playground/socket"
+	"github.com/ijt/tools/playground/socket"
 
 	// Imports so that go build/install automatically installs them.
 	_ "golang.org/x/tour/pic"

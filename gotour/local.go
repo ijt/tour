@@ -88,9 +88,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if host == "" {
-		host = "localhost"
-	}
 	if host != "127.0.0.1" && host != "localhost" {
 		log.Print(localhostWarning)
 	}

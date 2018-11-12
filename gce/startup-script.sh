@@ -20,7 +20,7 @@ go get github.com/ijt/tour/gotour
 cat >/etc/supervisor/conf.d/tour.conf << EOF
 [program:gotour]
 directory=/root/src/github.com/ijt/tour
-command=/root/bin/gotour -http=:80
+command=/root/bin/gotour -http=:80 -openbrowser=false
 autostart=true
 autorestart=true
 user=root

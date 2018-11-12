@@ -73,6 +73,16 @@ func findRoot() (string, error) {
 	return "", fmt.Errorf("could not find go-tour content; check $GOROOT and $GOPATH")
 }
 
+func GetOutboundIP() (net.IP, error) {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		return net.IP(nil), fmt.Errorf("dialing 8.8.8.8:80: %v", err)
+	}
+	defer conn.Close()
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP, nil
+}
+
 func main() {
 	flag.Parse()
 
@@ -87,6 +97,13 @@ func main() {
 	host, port, err := net.SplitHostPort(*httpListen)
 	if err != nil {
 		log.Fatal(err)
+	}
+	if host == "" {
+		ip, err := GetOutboundIP()
+		if err != nil {
+			log.Fatal(err)
+		}
+		host = ip.String()
 	}
 	if host != "127.0.0.1" && host != "localhost" {
 		log.Print(localhostWarning)

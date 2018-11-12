@@ -227,4 +227,4 @@ func startBrowser(url string) bool {
 func prepContent(r io.Reader) io.Reader { return r }
 
 // socketAddr returns the WebSocket handler address.
-func socketAddr() string { return "ws://" + httpAddr + socketPath }
+func socketAddr() string { return "" }
